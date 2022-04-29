@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,16 @@ public class Configuration extends YamlConfiguration {
     public Configuration(String configurationName) {
         this.configurationName = configurationName;
         setupFiles();
+    }
+
+    /**
+     * Creates a configuration file in the YAML format.
+     *
+     * @param configurationName the configuration file name excluding the extension.
+     */
+    public Configuration(String parentPath, String configurationName) {
+        this.configurationName = configurationName;
+        setupFiles(parentPath);
     }
 
     /**
@@ -82,13 +93,15 @@ public class Configuration extends YamlConfiguration {
         }
     }
 
-    private void setupFiles() {
-        file = new File(RoblePlugin.INSTANCE.getDataFolder(), configurationName + ".yml");
+    private void setupFiles(@NotNull String... parentPath) {
+        final String parent = ((parentPath.length > 0 ? (parentPath[0] + "/") : ""));
+
+        file = new File(RoblePlugin.INSTANCE.getDataFolder(), (parent + configurationName + ".yml"));
         if (!file.exists()) {
             file.getParentFile().mkdirs();
 
             try {
-                RoblePlugin.INSTANCE.saveResource(configurationName + ".yml", false);
+                RoblePlugin.INSTANCE.saveResource((parent + configurationName + ".yml"), false);
             } catch (IllegalArgumentException e) {
                 RoblePlugin.INSTANCE.getServer().getLogger().info(e.getMessage());
                 try {
