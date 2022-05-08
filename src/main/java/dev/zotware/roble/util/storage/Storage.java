@@ -26,6 +26,6 @@ public abstract class Storage {
 
     public Type getType() {return type;}
 
-    public enum Type {FLAT, SQL}
+    public enum Type {FLAT, SQLite, MySQL, MariaDB}
 
 }

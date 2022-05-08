@@ -19,7 +19,7 @@ public class SQLStorage extends Storage {
     private boolean useSSL;
 
     public SQLStorage(@NotNull RoblePlugin instance, @NotNull Type type, @Nullable String... properties) throws StorageException {
-        super(instance, Storage.Type.SQL);
+        super(instance, type);
         this.type = type;
         setUseSSL(false);
         setFilePath(null);
@@ -81,8 +81,6 @@ public class SQLStorage extends Storage {
                 default: { // defaults to SQLite
                     Class.forName("org.sqlite.JDBC");
                     CONNECTION = DriverManager.getConnection("jdbc:sqlite:" + getFilePath());
-
-
                 }
             }
 
@@ -127,7 +125,5 @@ public class SQLStorage extends Storage {
     public void setUseSSL(boolean useSSL) {this.useSSL = useSSL;}
 
     public boolean useSSL() {return useSSL;}
-
-    public enum Type {SQLite, MySQL, MariaDB}
 
 }
