@@ -12,15 +12,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SQLStorage extends Storage {
-
-    private final Type type;
     public Connection CONNECTION;
     private String filePath, host, database, username, password;
     private boolean useSSL;
 
     public SQLStorage(@NotNull RoblePlugin instance, @NotNull Type type, @Nullable String... properties) throws StorageException {
         super(instance, type);
-        this.type = type;
         setUseSSL(false);
         setFilePath(null);
 
@@ -60,7 +57,7 @@ public class SQLStorage extends Storage {
                 CONNECTION = null;
             }
 
-            switch (getSQLType()) {
+            switch (getType()) {
                 case MySQL: {
                     try {
                         Class.forName("com.mysql.cj.jdbc.Driver");
@@ -103,8 +100,6 @@ public class SQLStorage extends Storage {
     public String getFilePath() {return filePath;}
 
     public void setFilePath(String filePath) {this.filePath = filePath;}
-
-    public Type getSQLType() {return type;}
 
     public String getHost() {return host;}
 

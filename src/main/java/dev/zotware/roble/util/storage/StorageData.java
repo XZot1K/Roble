@@ -25,7 +25,7 @@ public abstract class StorageData {
     public abstract Map<String, Object> serialize();
 
     public void save() {
-        if (getStorage().getType() == Storage.Type.SQL) {
+        if (getStorage() instanceof SQLStorage) {
 
             final StringBuilder keys = new StringBuilder();
             for (String key : getStructure()) {
@@ -36,7 +36,7 @@ public abstract class StorageData {
             }
 
             final SQLStorage sqlStorage = (SQLStorage) getStorage();
-            switch (sqlStorage.getSQLType()) {
+            switch (sqlStorage.getType()) {
                 case MariaDB:
                 case MySQL: {
 
