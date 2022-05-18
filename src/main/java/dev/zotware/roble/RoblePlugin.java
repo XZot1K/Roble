@@ -106,7 +106,9 @@ public abstract class RoblePlugin extends JavaPlugin {
         return true;
     }
 
-    public void sendActionBar(@NotNull Player player, @NotNull String text, @Nullable String... placeholders) {
+    public void sendActionBar(@NotNull Player player, @Nullable String text, @Nullable String... placeholders) {
+        if (text == null || text.isEmpty()) return;
+
         final TextComponent textComponent = new TextComponent(color(applyPlaceholders(player, text, placeholders)));
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, textComponent);
     }
@@ -118,8 +120,8 @@ public abstract class RoblePlugin extends JavaPlugin {
      * @param message      The message with placeholders.
      * @param placeholders All placeholders in the format <placeholder>:<value>.
      */
-    public void send(@NotNull CommandSender recipient, @NotNull String message, @Nullable String... placeholders) {
-        if (message.isEmpty()) return;
+    public void send(@NotNull CommandSender recipient, @Nullable String message, @Nullable String... placeholders) {
+        if (message == null || message.isEmpty()) return;
 
         if (recipient instanceof Player) {
             final Player player = ((Player) recipient);
@@ -156,8 +158,8 @@ public abstract class RoblePlugin extends JavaPlugin {
      * @param message The message to translate.
      * @return The colored text.
      */
-    public String color(@NotNull String message) {
-        if (message.isEmpty()) return message;
+    public String color(@Nullable String message) {
+        if (message == null || message.isEmpty()) return message;
 
         if (HEX_VERSION) {
             Matcher matcher = hexPattern.matcher(message);
@@ -171,8 +173,8 @@ public abstract class RoblePlugin extends JavaPlugin {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
-    public String applyPlaceholders(@NotNull String text, @Nullable String... placeholders) {
-        if (text.isEmpty() || placeholders == null || placeholders.length <= 0)
+    public String applyPlaceholders(@Nullable String text, @Nullable String... placeholders) {
+        if (text == null || text.isEmpty() || placeholders == null || placeholders.length <= 0)
             return text;
 
         for (int i = -1; ++i < placeholders.length; ) {
@@ -192,7 +194,8 @@ public abstract class RoblePlugin extends JavaPlugin {
      * @param placeholders The placeholders in the format <placeholder>:<replacement>.
      * @return The text with applied replacements.
      */
-    public String applyPlaceholders(@NotNull Player player, @NotNull String text, @Nullable String... placeholders) {
+    public String applyPlaceholders(@NotNull Player player, @Nullable String text, @Nullable String... placeholders) {
+        if (text == null || text.isEmpty()) return text;
         return applyPlaceholders((papiInstalled ? me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, text) : text), placeholders);
     }
 
@@ -225,7 +228,9 @@ public abstract class RoblePlugin extends JavaPlugin {
      * @param wordLineLimit The line size in terms of word count.
      * @return wraps the string to multiple lines
      */
-    public List<String> wrapString(@NotNull String text, int wordLineLimit) {
+    public List<String> wrapString(@Nullable String text, int wordLineLimit) {
+        if (text == null || text.isEmpty()) return Collections.emptyList();
+
         List<String> result = new ArrayList<>();
         final int longWordCount = getConfig().getInt("description-long-word-wrap");
         final String[] words = text.trim().split(" ");
