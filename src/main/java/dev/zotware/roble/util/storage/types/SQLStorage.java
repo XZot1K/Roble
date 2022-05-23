@@ -48,6 +48,27 @@ public class SQLStorage extends Storage {
 
     }
 
+    /**
+     * Creates a table with the provided properties.
+     *
+     * @param tableName The table name.
+     * @param columns   The columns and variable identifier seperated by a space.
+     */
+    public void createTables(@NotNull String tableName, @NotNull String... columns) {
+        final StringBuilder syntax = new StringBuilder("CREATE TABLE IF NOT EXISTS " + tableName + "(");
+        for (int i = -1; ++i < columns.length; ) {
+            final String column = columns[i];
+
+            if (syntax.length() > 0) syntax.append(", ");
+            syntax.append(column);
+        }
+        syntax.append(");");
+
+        if (syntax.length() > 0)
+            try (Statement statement = CONNECTION.createStatement()) {
+                statement.executeUpdate(syntax.toString());
+            } catch (SQLException e) {e.printStackTrace();}
+    }
 
     @Override
     public void register() {
@@ -66,6 +87,7 @@ public class SQLStorage extends Storage {
                     CONNECTION = DriverManager.getConnection("jdbc:mysql://" + getHost() + "/" + getDatabase()
                             + "?" + (useSSL() ? "verifyServerCertificate=false&useSSL=true&requireSSL=true" : "useSSL=false")
                             + "&autoReconnect=true&useUnicode=yes", getUsername(), getPassword());
+                    break;
                 }
 
                 case MariaDB: {
@@ -73,11 +95,13 @@ public class SQLStorage extends Storage {
                     CONNECTION = DriverManager.getConnection("jdbc:mariadb://" + getHost() + "/" + getDatabase()
                             + "?" + (useSSL() ? "verifyServerCertificate=false&useSSL=true&requireSSL=true" : "useSSL=false")
                             + "&autoReconnect=true&useUnicode=yes", getUsername(), getPassword());
+                    break;
                 }
 
                 default: { // defaults to SQLite
                     Class.forName("org.sqlite.JDBC");
                     CONNECTION = DriverManager.getConnection("jdbc:sqlite:" + getFilePath());
+                    break;
                 }
             }
 
