@@ -4,6 +4,7 @@ import dev.zotware.roble.exceptions.StorageException;
 import dev.zotware.roble.util.storage.types.FlatFile;
 import dev.zotware.roble.util.storage.types.SQLStorage;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -24,6 +25,9 @@ public abstract class StorageData {
 
     public abstract Map<String, Object> serialize();
 
+    /**
+     * Saves the data based on existing data provided.
+     */
     public void save() {
         if (getStorage() instanceof SQLStorage) {
 
@@ -87,6 +91,29 @@ public abstract class StorageData {
         final FlatFile flatFile = (FlatFile) getStorage();
         for (Map.Entry<String, Object> entry : serialize().entrySet())
             flatFile.getConfiguration().set(entry.getKey(), entry.getValue());
+        flatFile.getConfiguration().save();
+    }
+
+    /**
+     * Deletes the primary key from the storage.
+     *
+     * @param primaryKey The key identifier.
+     * @param value      The value the key would be set to (Only for SQL).
+     */
+    public void delete(@NotNull String primaryKey, @Nullable String... value) {
+        if (getStorage() instanceof SQLStorage && value.length > 0) {
+            final SQLStorage sqlStorage = (SQLStorage) getStorage();
+
+            try (PreparedStatement statement = sqlStorage.CONNECTION.prepareStatement("DELETE FROM "
+                    + getTable() + " WHERE " + primaryKey + "= '" + value[0] + "';")) {
+                statement.executeUpdate();
+            } catch (SQLException e) {e.printStackTrace();}
+
+            return;
+        }
+
+        final FlatFile flatFile = (FlatFile) getStorage();
+        flatFile.getConfiguration().set(primaryKey, null);
         flatFile.getConfiguration().save();
     }
 
