@@ -6,7 +6,7 @@
 
     <groupId>dev.zotware</groupId>
     <artifactId>Roble</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.5b</version>
     <packaging>jar</packaging>
 
     <name>Roble</name>
