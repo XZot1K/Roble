@@ -24,7 +24,8 @@ public class SQLStorage extends Storage {
         switch (type) {
             case MariaDB:
             case MySQL: {
-                if (properties.length < 5) throw new StorageException(type.name() + " requires a host, port, database, username, and password to be defined.");
+                if (properties.length < 5) throw new StorageException(type.name()
+                        + " requires a host, port, database, username, and password to be defined.");
 
                 setHost(properties[0] + ":" + properties[1]);
                 setDatabase(properties[2]);
