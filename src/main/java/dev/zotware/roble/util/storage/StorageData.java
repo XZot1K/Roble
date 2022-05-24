@@ -82,8 +82,6 @@ public abstract class StorageData {
                         values.append("'").append(value).append("'");
                     }
 
-                    System.out.println(keys);
-                    System.out.println(values);
                     try (PreparedStatement statement = sqlStorage.CONNECTION.prepareStatement("INSERT OR REPLACE INTO "
                             + getTable() + " (" + keys + ") VALUES (" + values + ");")) {
                         statement.executeUpdate();

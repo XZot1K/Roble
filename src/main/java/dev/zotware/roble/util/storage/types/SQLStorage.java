@@ -55,20 +55,19 @@ public class SQLStorage extends Storage {
      * @param tableName The table name.
      * @param columns   The columns and variable identifier seperated by a space.
      */
-    public void createTables(@NotNull String tableName, @NotNull String... columns) {
-        final StringBuilder syntax = new StringBuilder("CREATE TABLE IF NOT EXISTS " + tableName + "(");
+    public void createTable(@NotNull String tableName, @NotNull String... columns) {
+        StringBuilder syntax = new StringBuilder(("CREATE TABLE IF NOT EXISTS " + tableName + " ("));
         for (int i = -1; ++i < columns.length; ) {
             final String column = columns[i];
 
-            if (syntax.length() > 0) syntax.append(", ");
+            if (!syntax.toString().endsWith("(")) syntax.append(", ");
             syntax.append(column);
         }
         syntax.append(");");
 
-        if (syntax.length() > 0)
-            try (Statement statement = CONNECTION.createStatement()) {
-                statement.executeUpdate(syntax.toString());
-            } catch (SQLException e) {e.printStackTrace();}
+        try (Statement statement = CONNECTION.createStatement()) {
+            statement.executeUpdate(syntax.toString());
+        } catch (SQLException e) {e.printStackTrace();}
     }
 
     @Override
