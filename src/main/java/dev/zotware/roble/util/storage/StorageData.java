@@ -30,26 +30,24 @@ public abstract class StorageData {
      */
     public void save() {
         if (getStorage() instanceof SQLStorage) {
-
-            final StringBuilder keys = new StringBuilder();
-            for (String key : getStructure()) {
-                if (keys.length() > 0) keys.append(", ");
-
-                if (key.contains(" ")) keys.append(key.split(" ")[0]);
-                else keys.append(key);
-            }
-
             final SQLStorage sqlStorage = (SQLStorage) getStorage();
             switch (sqlStorage.getType()) {
                 case MariaDB:
                 case MySQL: {
 
                     final Map<String, Object> valueMap = serialize();
-                    final StringBuilder values = new StringBuilder(), valuesDupe = new StringBuilder();
+                    final StringBuilder keys = new StringBuilder(), values = new StringBuilder(), valuesDupe = new StringBuilder();
                     for (String key : getStructure()) {
                         final Object value = valueMap.getOrDefault(key, null);
                         if (value == null) continue;
 
+                        // handle key string
+                        if (keys.length() > 0) keys.append(", ");
+                        if (key.contains(" ")) keys.append(key.split(" ")[0]);
+                        else if (key.contains(":")) keys.append(key.split(":")[0]);
+                        else keys.append(key);
+
+                        // handle value string
                         if (values.length() > 0) values.append(", ");
                         values.append("'").append(value).append("'");
 
@@ -68,11 +66,18 @@ public abstract class StorageData {
                 default: { // defaults to SQLite
 
                     final Map<String, Object> valueMap = serialize();
-                    final StringBuilder values = new StringBuilder();
+                    final StringBuilder keys = new StringBuilder(), values = new StringBuilder();
                     for (String key : getStructure()) {
-                        final Object value = valueMap.getOrDefault(key, null);
+                        final Object value = valueMap.getOrDefault(key, "");
                         if (value == null) continue;
 
+                        // handle key string
+                        if (keys.length() > 0) keys.append(", ");
+                        if (key.contains(" ")) keys.append(key.split(" ")[0]);
+                        else if (key.contains(":")) keys.append(key.split(":")[0]);
+                        else keys.append(key);
+
+                        // handle value string
                         if (values.length() > 0) values.append(", ");
                         values.append("'").append(value).append("'");
                     }
@@ -80,13 +85,12 @@ public abstract class StorageData {
                     System.out.println(keys);
                     System.out.println(values);
                     try (PreparedStatement statement = sqlStorage.CONNECTION.prepareStatement("INSERT OR REPLACE INTO "
-                            + getTable() + "(" + keys + ") VALUES(" + values + ");")) {
+                            + getTable() + " (" + keys + ") VALUES (" + values + ");")) {
                         statement.executeUpdate();
                     } catch (SQLException e) {e.printStackTrace();}
 
                 }
             }
-
             return;
         }
 
