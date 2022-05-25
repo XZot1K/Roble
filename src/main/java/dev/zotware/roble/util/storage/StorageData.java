@@ -82,8 +82,12 @@ public abstract class StorageData {
                         values.append("'").append(value).append("'");
                     }
 
+                    System.out.println("INSERT OR REPLACE INTO " + getTable() + "(" + keys + ") VALUES(" + values + ");");
+                    // TODO remove
+
+
                     try (PreparedStatement statement = sqlStorage.CONNECTION.prepareStatement("INSERT OR REPLACE INTO "
-                            + getTable() + " (" + keys + ") VALUES (" + values + ");")) {
+                            + getTable() + "(" + keys + ") VALUES(" + values + ");")) {
                         statement.executeUpdate();
                     } catch (SQLException e) {e.printStackTrace();}
 
