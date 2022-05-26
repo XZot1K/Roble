@@ -28,14 +28,13 @@ public abstract class StorageData {
     /**
      * Saves the data based on existing data provided.
      */
-    public void save() {
+    public void save(Map<String, Object> valueMap) {
         if (getStorage() instanceof SQLStorage) {
             final SQLStorage sqlStorage = (SQLStorage) getStorage();
             switch (sqlStorage.getType()) {
                 case MariaDB:
                 case MySQL: {
 
-                    final Map<String, Object> valueMap = serialize();
                     final StringBuilder keys = new StringBuilder(), values = new StringBuilder(), valuesDupe = new StringBuilder();
                     for (String key : getStructure()) {
                         final Object value = valueMap.getOrDefault(key, null);
@@ -65,7 +64,6 @@ public abstract class StorageData {
 
                 default: { // defaults to SQLite
 
-                    final Map<String, Object> valueMap = serialize();
                     final StringBuilder keys = new StringBuilder(), values = new StringBuilder();
                     for (String key : getStructure()) {
                         final Object value = valueMap.getOrDefault(key, "");
