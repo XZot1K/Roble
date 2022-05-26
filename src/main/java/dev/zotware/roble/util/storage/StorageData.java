@@ -28,13 +28,13 @@ public abstract class StorageData {
     /**
      * Saves the data based on existing data provided.
      */
-    public void save(Map<String, Object> valueMap) {
+    public void save() {
         if (getStorage() instanceof SQLStorage) {
+            final Map<String, Object> valueMap = serialize();
             final SQLStorage sqlStorage = (SQLStorage) getStorage();
             switch (sqlStorage.getType()) {
                 case MariaDB:
                 case MySQL: {
-
                     final StringBuilder keys = new StringBuilder(), values = new StringBuilder(), valuesDupe = new StringBuilder();
                     for (String key : getStructure()) {
                         final Object value = valueMap.getOrDefault(key, null);
@@ -63,32 +63,30 @@ public abstract class StorageData {
                 }
 
                 default: { // defaults to SQLite
-
                     final StringBuilder keys = new StringBuilder(), values = new StringBuilder();
                     for (String key : getStructure()) {
-                        final Object value = valueMap.getOrDefault(key, "");
+
+                        final String fixedKey;
+                        if (key.contains(" ")) fixedKey = key.split(" ")[0];
+                        else if (key.contains(":")) fixedKey = key.split(":")[0];
+                        else fixedKey = key;
+
+                        final Object value = valueMap.getOrDefault(fixedKey, "");
                         if (value == null) continue;
 
                         // handle key string
                         if (keys.length() > 0) keys.append(", ");
-                        if (key.contains(" ")) keys.append(key.split(" ")[0]);
-                        else if (key.contains(":")) keys.append(key.split(":")[0]);
-                        else keys.append(key);
+                        keys.append(fixedKey);
 
                         // handle value string
                         if (values.length() > 0) values.append(", ");
                         values.append("'").append(value).append("'");
                     }
 
-                    System.out.println("INSERT OR REPLACE INTO " + getTable() + "(" + keys + ") VALUES(" + values + ");");
-                    // TODO remove
-
-
                     try (PreparedStatement statement = sqlStorage.CONNECTION.prepareStatement("INSERT OR REPLACE INTO "
                             + getTable() + "(" + keys + ") VALUES(" + values + ");")) {
                         statement.executeUpdate();
                     } catch (SQLException e) {e.printStackTrace();}
-
                 }
             }
             return;
